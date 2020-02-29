@@ -12,6 +12,8 @@ import { Semiring } from 'fp-ts/lib/Semiring'
 import { Ring } from 'fp-ts/lib/Ring'
 import { Field } from 'fp-ts/lib/Field'
 import { FunctionN } from 'fp-ts/lib/function'
+import { Traversable } from 'fp-ts/lib/Traversable'
+import { identity } from 'fp-ts/lib/Identity'
 
 export const eq = {
   reflexivity: <A>(E: Eq<A>) => (a: A): boolean => {
@@ -183,4 +185,17 @@ export const monad = {
   derivedMap: <M, A, B>(M: Monad<M>, S: Eq<HKT<M, B>>, ab: FunctionN<[A], B>) => (fa: HKT<M, A>): boolean => {
     return S.equals(M.map(fa, ab), M.chain(fa, a => M.of(ab(a))))
   }
+}
+
+export const traversable = {
+  identity: <T, A>(T: Traversable<T>, S: Eq<HKT<T, A>>) => (ta: HKT<T, A>): boolean => {
+    return S.equals(T.traverse(identity)(ta, a => a), ta)
+  }
+  /* TODO
+  composition: <T, A, B, C>(T: Traversable<T>, S: Eq<HKT<T, C>>, ab: FunctionN<[A], B>, bc: FunctionN<[B], C>) => (
+    // fa: HKT<T, A>
+  ): boolean => {
+    return true
+  }
+  */
 }
